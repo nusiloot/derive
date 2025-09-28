@@ -43,6 +43,7 @@ function extractGPXTracks(gpx) {
 
     for (const trk of tracks) {
         const name = getTextContent(trk, 'name') || 'untitled';
+        const activityType = getTextContent(trk, 'type') || null;
         let timestamp;
 
         for (const trkseg of queryElements(trk, 'trkseg')) {
@@ -68,7 +69,7 @@ function extractGPXTracks(gpx) {
             }
 
             if (points.length > 0) {
-                parsedTracks.push({ timestamp, points, name });
+                parsedTracks.push({ timestamp, points, name, activityType });
             }
         }
     }
@@ -112,6 +113,7 @@ function extractTCXTracks(tcx, name) {
     }
 
     const parsedTracks = [];
+    const activityType = activities[0].getAttribute('Sport') || null;
 
     for (const activity of activities) {
         const laps = queryElements(activity, 'Lap');
@@ -153,7 +155,7 @@ function extractTCXTracks(tcx, name) {
                 }
 
                 if (points.length > 0) {
-                    parsedTracks.push({ timestamp, points, name });
+                    parsedTracks.push({ timestamp, points, name, activityType });
                 }
             }
         }
@@ -170,6 +172,7 @@ function extractFITTracks(fit, name) {
 
     let timestamp;
     const points = [];
+    const activityType = fit.sport ? fit.sport.sport.toLowerCase() : null;
     for (const record of fit.records) {
         if (record.position_lat && record.position_long) {
             points.push({
@@ -181,7 +184,7 @@ function extractFITTracks(fit, name) {
         record.timestamp && (timestamp = record.timestamp);
     }
 
-    return points.length > 0 ? [{ timestamp, points, name }] : [];
+    return points.length > 0 ? [{ timestamp, points, name, activityType }] : [];
 }
 
 function extractIGCTracks(igc) {
