@@ -28,6 +28,15 @@ const DEFAULT_OPTIONS = {
     }
 };
 
+// Color mapping for different activity types
+const ACTIVITY_COLORS = {
+    'walking': '#ffc0cb',
+    'hiking': '#ffc0cb',
+    'running': '#ff0000',
+    'cycling': '#00ff00',
+    'swimming': '#0000ff',
+};
+
 
 export default class GpxMap {
     constructor(options) {
@@ -233,12 +242,23 @@ export default class GpxMap {
         let lineOptions = Object.assign({}, this.options.lineOptions);
 
         if (lineOptions.detectColors) {
+            // set line option color depending on activity type:
+            if (track.activityType) {
+                const color = ACTIVITY_COLORS[track.activityType.toLowerCase()];
+                if (color) {
+                    lineOptions.color = color;
+                }
+            }
+
+            // Legacy support for file-ending colors:
             if (/-(Hike|Walk)\.gpx/.test(track.filename)) {
-                lineOptions.color = '#ffc0cb';
+                lineOptions.color = ACTIVITY_COLORS["hiking"];
             } else if (/-Run\.gpx/.test(track.filename)) {
-                lineOptions.color = '#ff0000';
+                lineOptions.color = ACTIVITY_COLORS["running"];
             } else if (/-Ride\.gpx/.test(track.filename)) {
-                lineOptions.color = '#00ffff';
+                lineOptions.color = ACTIVITY_COLORS["cycling"];
+            } else if (/-Swim\.gpx/.test(track.filename)) {
+                lineOptions.color = ACTIVITY_COLORS["swimming"];
             }
         }
 
